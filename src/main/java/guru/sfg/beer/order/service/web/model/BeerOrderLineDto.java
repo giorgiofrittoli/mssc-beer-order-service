@@ -42,6 +42,7 @@ public class BeerOrderLineDto extends BaseItem {
 
     private String upc;
     private String beerName;
+    private String beerStyle;
     private UUID beerId;
     private Integer orderQuantity = 0;
 }
