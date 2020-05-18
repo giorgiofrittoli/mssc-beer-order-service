@@ -9,8 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Objects;
-import java.util.UUID;
+import java.util.Optional;
 
 @ConfigurationProperties(prefix = "sfg.brewery", ignoreInvalidFields = false)
 @Component
@@ -25,7 +24,7 @@ public class BeerServiceRestTemplaceImpl implements BeerService {
     }
 
     @Override
-    public BeerDto getBeer(String upc) {
+    public Optional<BeerDto> getBeer(String upc) {
 
         ResponseEntity<BeerDto> responseEntity = restTemplate.exchange(
                 beerServiceHost + BEER_PATH,
@@ -36,7 +35,7 @@ public class BeerServiceRestTemplaceImpl implements BeerService {
                 (Object) upc
         );
 
-        return Objects.requireNonNull(responseEntity.getBody());
+        return Optional.of(responseEntity.getBody());
 
     }
 
