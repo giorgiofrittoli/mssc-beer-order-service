@@ -32,7 +32,7 @@ public class BeerServiceRestTemplaceImpl implements BeerService {
                 null,
                 new ParameterizedTypeReference<BeerDto>() {
                 },
-                (Object) upc
+                upc
         );
 
         return Optional.of(responseEntity.getBody());
