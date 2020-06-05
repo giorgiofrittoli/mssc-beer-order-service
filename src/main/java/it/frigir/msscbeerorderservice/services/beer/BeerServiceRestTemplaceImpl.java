@@ -1,6 +1,6 @@
 package it.frigir.msscbeerorderservice.services.beer;
 
-import it.frigir.msscbeerorderservice.services.beer.model.BeerDto;
+import it.frigir.brewery.model.BeerDto;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;

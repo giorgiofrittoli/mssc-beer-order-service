@@ -1,6 +1,6 @@
 package it.frigir.msscbeerorderservice.services.beer;
 
-import it.frigir.msscbeerorderservice.services.beer.model.BeerDto;
+import it.frigir.brewery.model.BeerDto;
 
 import java.util.Optional;
 

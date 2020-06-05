@@ -1,4 +1,4 @@
-package it.frigir.msscbeerorderservice.services.beer.model;
+package it.frigir.brewery.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -38,7 +38,7 @@ public class BeerDto{
     private String beerName;
 
     @NotNull
-    private BeerStyleEnum beerStyle;
+    private String beerStyle;
 
     @NotNull
     private String upc;
