@@ -18,8 +18,8 @@
 package it.frigir.msscbeerorderservice.services;
 
 
-import it.frigir.msscbeerorderservice.web.model.BeerOrderDto;
-import it.frigir.msscbeerorderservice.web.model.BeerOrderPagedList;
+import it.frigir.brewery.model.BeerOrderDto;
+import it.frigir.brewery.model.BeerOrderPagedList;
 import org.springframework.data.domain.Pageable;
 
 import java.util.UUID;

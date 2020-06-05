@@ -18,7 +18,7 @@
 package it.frigir.msscbeerorderservice.web.mappers;
 
 import it.frigir.msscbeerorderservice.domain.BeerOrder;
-import it.frigir.msscbeerorderservice.web.model.BeerOrderDto;
+import it.frigir.brewery.model.BeerOrderDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

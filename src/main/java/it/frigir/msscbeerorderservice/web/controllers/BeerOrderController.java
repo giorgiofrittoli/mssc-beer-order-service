@@ -18,8 +18,8 @@
 package it.frigir.msscbeerorderservice.web.controllers;
 
 import it.frigir.msscbeerorderservice.services.BeerOrderService;
-import it.frigir.msscbeerorderservice.web.model.BeerOrderDto;
-import it.frigir.msscbeerorderservice.web.model.BeerOrderPagedList;
+import it.frigir.brewery.model.BeerOrderDto;
+import it.frigir.brewery.model.BeerOrderPagedList;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

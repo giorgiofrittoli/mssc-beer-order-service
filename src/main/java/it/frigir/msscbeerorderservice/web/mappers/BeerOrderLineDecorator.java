@@ -3,7 +3,7 @@ package it.frigir.msscbeerorderservice.web.mappers;
 
 import it.frigir.msscbeerorderservice.domain.BeerOrderLine;
 import it.frigir.msscbeerorderservice.services.beer.BeerService;
-import it.frigir.msscbeerorderservice.web.model.BeerOrderLineDto;
+import it.frigir.brewery.model.BeerOrderLineDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class BeerOrderLineDecorator implements BeerOrderLineMapper {
