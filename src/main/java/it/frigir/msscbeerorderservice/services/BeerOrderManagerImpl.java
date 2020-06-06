@@ -18,6 +18,8 @@ import javax.transaction.Transactional;
 @RequiredArgsConstructor
 public class BeerOrderManagerImpl implements BeerOrderManager {
 
+    public static String BEER_ORDER_ID_HEADER = "beer_order_id";
+
     private final BeerOrderRepository beerOrderRepository;
     private final StateMachineFactory<BeerOrderStatusEnum, BeerOrderEventEnum> stateMachineFactory;
 
@@ -36,7 +38,7 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
     private void sendBeerOrderEvent(BeerOrder beerOrder, BeerOrderEventEnum eventEnum) {
         StateMachine<BeerOrderStatusEnum, BeerOrderEventEnum> sm = build(beerOrder);
 
-        Message msg = MessageBuilder.withPayload(eventEnum).build();
+        Message msg = MessageBuilder.withPayload(eventEnum).setHeader(BEER_ORDER_ID_HEADER, beerOrder.getId()).build();
 
         sm.sendEvent(msg);
 
