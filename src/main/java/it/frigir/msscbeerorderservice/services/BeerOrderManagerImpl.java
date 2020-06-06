@@ -4,6 +4,7 @@ import it.frigir.msscbeerorderservice.domain.BeerOrder;
 import it.frigir.msscbeerorderservice.domain.BeerOrderEventEnum;
 import it.frigir.msscbeerorderservice.domain.BeerOrderStatusEnum;
 import it.frigir.msscbeerorderservice.repositories.BeerOrderRepository;
+import it.frigir.msscbeerorderservice.sm.BeerOrderStateChangeInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -22,6 +23,7 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
 
     private final BeerOrderRepository beerOrderRepository;
     private final StateMachineFactory<BeerOrderStatusEnum, BeerOrderEventEnum> stateMachineFactory;
+    private final BeerOrderStateChangeInterceptor beerOrderStateChangeInterceptor;
 
     @Transactional
     @Override
@@ -50,7 +52,10 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
 
         sm.getStateMachineAccessor()
                 .doWithAllRegions(
-                        sma -> sma.resetStateMachine(new DefaultStateMachineContext<>(beerOrder.getOrderStatus(), null, null, null))
+                        sma -> {
+                            sma.addStateMachineInterceptor(beerOrderStateChangeInterceptor);
+                            sma.resetStateMachine(new DefaultStateMachineContext<>(beerOrder.getOrderStatus(), null, null, null));
+                        }
                 );
 
         sm.start();
