@@ -31,7 +31,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BeerOrderLineDto{
+public class BeerOrderLineDto {
 
     @JsonProperty("id")
     private UUID id = null;
@@ -39,11 +39,11 @@ public class BeerOrderLineDto{
     @JsonProperty("version")
     private Integer version = null;
 
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZ", shape=JsonFormat.Shape.STRING)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ", shape = JsonFormat.Shape.STRING)
     @JsonProperty("createdDate")
     private OffsetDateTime createdDate = null;
 
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZ", shape=JsonFormat.Shape.STRING)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZ", shape = JsonFormat.Shape.STRING)
     @JsonProperty("lastModifiedDate")
     private OffsetDateTime lastModifiedDate = null;
 
@@ -52,4 +52,5 @@ public class BeerOrderLineDto{
     private String beerStyle;
     private UUID beerId;
     private Integer orderQuantity = 0;
+    private Integer quantityAllocated = 0;
 }
