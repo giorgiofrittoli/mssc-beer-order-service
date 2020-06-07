@@ -3,9 +3,6 @@ package it.frigir.msscbeerorderservice.services.beer;
 import it.frigir.brewery.model.BeerDto;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -13,29 +10,21 @@ import java.util.Optional;
 
 @ConfigurationProperties(prefix = "sfg.brewery", ignoreInvalidFields = false)
 @Component
-public class BeerServiceRestTemplaceImpl implements BeerService {
+public class BeerServiceRestTemplateImpl implements BeerService {
 
     private final RestTemplate restTemplate;
-    private final String BEER_PATH = "/api/v1/beerUpc/{upc}";
+    public static final String BEER_PATH_V1 = "/api/v1/beer/";
+    public static final String BEER_UPC_PATH_V1 = "/api/v1/beerUpc/";
     private String beerServiceHost;
 
-    public BeerServiceRestTemplaceImpl(RestTemplateBuilder restTemplateBuilder) {
+    public BeerServiceRestTemplateImpl(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
     }
 
     @Override
     public Optional<BeerDto> getBeer(String upc) {
 
-        ResponseEntity<BeerDto> responseEntity = restTemplate.exchange(
-                beerServiceHost + BEER_PATH,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<BeerDto>() {
-                },
-                upc
-        );
-
-        return Optional.of(responseEntity.getBody());
+        return Optional.of(restTemplate.getForObject(beerServiceHost + BEER_UPC_PATH_V1 + upc, BeerDto.class));
 
     }
 
