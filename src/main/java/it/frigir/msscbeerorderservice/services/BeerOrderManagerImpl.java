@@ -62,6 +62,7 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
         }, () -> log.error("Beer order not found " + beerOrderId));
     }
 
+    @Transactional
     @Override
     public void processBeerOrderAllocation(BeerOrderDto beerOrderDto,
                                            Boolean allocationError,
@@ -73,14 +74,13 @@ public class BeerOrderManagerImpl implements BeerOrderManager {
             if (allocationError) {
                 sendBeerOrderEvent(beerOrder, BeerOrderEventEnum.ALLOCATION_FAILED);
             } else if (pendingInventory) {
+                updateAllocatedQty(beerOrderDto, beerOrder);
                 sendBeerOrderEvent(beerOrder, BeerOrderEventEnum.ALLOCATION_NO_INVENTORY);
-                updateAllocatedQty(beerOrderDto, beerOrder);
             } else {
-                sendBeerOrderEvent(beerOrder, BeerOrderEventEnum.ALLOCATION_SUCCESS);
                 updateAllocatedQty(beerOrderDto, beerOrder);
+                sendBeerOrderEvent(beerOrder, BeerOrderEventEnum.ALLOCATION_SUCCESS);
             }
 
-            updateAllocatedQty(beerOrderDto, beerOrder);
         }, () -> log.error("Beer order not found " + beerOrderDto));
 
     }
