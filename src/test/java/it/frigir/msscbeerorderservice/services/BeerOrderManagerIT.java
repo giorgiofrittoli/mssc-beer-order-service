@@ -90,17 +90,48 @@ public class BeerOrderManagerIT {
 
         BeerOrder beerOrder = createBeerOrder();
 
-        beerOrderManager.newBeerOrder(beerOrder);
+        BeerOrder savedBeerOrder = beerOrderManager.newBeerOrder(beerOrder);
 
         await().untilAsserted(() -> {
-            BeerOrder foundOrder = beerOrderRepository.findById(beerOrder.getId()).get();
+            BeerOrder foundOrder = beerOrderRepository.findById(savedBeerOrder.getId()).get();
             assertEquals(BeerOrderStatusEnum.ALLOCATED, foundOrder.getOrderStatus());
         });
 
-        BeerOrder validatedBeerOrder = beerOrderRepository.findById(beerOrder.getId()).get();
+        BeerOrder validatedBeerOrder = beerOrderRepository.findById(savedBeerOrder.getId()).get();
 
         assertNotNull(validatedBeerOrder);
         assertEquals(BeerOrderStatusEnum.ALLOCATED, validatedBeerOrder.getOrderStatus());
+
+    }
+
+    @Test
+    void newToPickedUp() throws JsonProcessingException {
+
+        BeerDto beerDto = BeerDto.builder().id(beerId).upc(UPC).build();
+
+        wireMockServer.stubFor(get(BeerServiceRestTemplateImpl.BEER_UPC_PATH_V1 + beerDto.getUpc())
+                .willReturn(okJson(objectMapper.writeValueAsString(beerDto))));
+
+        BeerOrder beerOrder = createBeerOrder();
+
+        BeerOrder savedBeerOrder = beerOrderManager.newBeerOrder(beerOrder);
+
+        await().untilAsserted(() -> {
+            BeerOrder foundOrder = beerOrderRepository.findById(savedBeerOrder.getId()).get();
+            assertEquals(BeerOrderStatusEnum.ALLOCATED, foundOrder.getOrderStatus());
+        });
+
+        beerOrderManager.pickUpOrder(savedBeerOrder.getId());
+
+        await().untilAsserted(() -> {
+            BeerOrder foundOrder = beerOrderRepository.findById(savedBeerOrder.getId()).get();
+            assertEquals(BeerOrderStatusEnum.PICKED_UP, foundOrder.getOrderStatus());
+        });
+
+        BeerOrder pickedUpBeerOrder = beerOrderRepository.findById(savedBeerOrder.getId()).get();
+
+        assertNotNull(pickedUpBeerOrder);
+        assertEquals(BeerOrderStatusEnum.PICKED_UP, pickedUpBeerOrder.getOrderStatus());
 
     }
 
