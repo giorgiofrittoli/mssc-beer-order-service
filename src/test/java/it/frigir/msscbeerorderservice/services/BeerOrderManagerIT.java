@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jenspiegsa.wiremockextension.WireMockExtension;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import it.frigir.brewery.model.BeerDto;
+import it.frigir.brewery.model.events.FailedAllocation;
+import it.frigir.msscbeerorderservice.config.JmsConfig;
 import it.frigir.msscbeerorderservice.domain.BeerOrder;
 import it.frigir.msscbeerorderservice.domain.BeerOrderLine;
 import it.frigir.msscbeerorderservice.domain.BeerOrderStatusEnum;
@@ -20,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jms.core.JmsTemplate;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,7 +42,7 @@ public class BeerOrderManagerIT {
 
     public static final String FAIL_VALIDATION_CUSTOM_REF = "fail-validation";
     public static final String ALLOCATION_PENDING_CUSTOM_REF = "allocation-pending";
-    public static final String FAIL_ALLOCATION_CUSTOM_REF = "fail-pending";
+    public static final String FAIL_ALLOCATION_CUSTOM_REF = "fail-allocation";
 
     @Autowired
     BeerOrderManager beerOrderManager;
@@ -59,6 +62,9 @@ public class BeerOrderManagerIT {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    JmsTemplate jmsTemplate;
 
     final String UPC = "12345";
 
@@ -155,10 +161,10 @@ public class BeerOrderManagerIT {
             assertEquals(BeerOrderStatusEnum.VALIDATION_EXCEPTION, foundOrder.getOrderStatus());
         });
 
-        BeerOrder validatedBeerOrder = beerOrderRepository.findById(savedBeerOrder.getId()).get();
+        BeerOrder failedValidationBeerOrder = beerOrderRepository.findById(savedBeerOrder.getId()).get();
 
-        assertNotNull(validatedBeerOrder);
-        assertEquals(BeerOrderStatusEnum.VALIDATION_EXCEPTION, validatedBeerOrder.getOrderStatus());
+        assertNotNull(failedValidationBeerOrder);
+        assertEquals(BeerOrderStatusEnum.VALIDATION_EXCEPTION, failedValidationBeerOrder.getOrderStatus());
 
     }
 
@@ -182,6 +188,12 @@ public class BeerOrderManagerIT {
 
         assertNotNull(failedAllocationBeerOrder);
         assertEquals(BeerOrderStatusEnum.ALLOCATION_EXCEPTION, failedAllocationBeerOrder.getOrderStatus());
+
+
+        FailedAllocation failedAllocation = (FailedAllocation) jmsTemplate.receiveAndConvert(JmsConfig.FAILED_ALLOCATION_QUEUE);
+
+        assertNotNull(failedAllocationBeerOrder);
+        assertEquals(failedAllocationBeerOrder.getId(), failedAllocation.getBeerOrderId());
     }
 
     @Test

@@ -28,8 +28,8 @@ public class BeerOrderAllocationListener {
 
         jmsTemplate.convertAndSend(JmsConfig.ALLOCATE_ORDER_RESPONSE_QUEUE,
                 AllocateOrderResult.builder()
-                        .allocationError(!allocateOrderRequest.getBeerOrder().getCustomerRef().equals(BeerOrderManagerIT.FAIL_ALLOCATION_CUSTOM_REF))
-                        .pendingInventory(!allocateOrderRequest.getBeerOrder().getCustomerRef().equals(BeerOrderManagerIT.ALLOCATION_PENDING_CUSTOM_REF))
+                        .allocationError(allocateOrderRequest.getBeerOrder().getCustomerRef().equals(BeerOrderManagerIT.FAIL_ALLOCATION_CUSTOM_REF))
+                        .pendingInventory(allocateOrderRequest.getBeerOrder().getCustomerRef().equals(BeerOrderManagerIT.ALLOCATION_PENDING_CUSTOM_REF))
                         .beerOrderDto(allocateOrderRequest.getBeerOrder()).build()
         );
     }
