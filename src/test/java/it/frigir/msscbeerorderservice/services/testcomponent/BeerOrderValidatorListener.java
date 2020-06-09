@@ -27,7 +27,8 @@ public class BeerOrderValidatorListener {
 
         jmsTemplate.convertAndSend(JmsConfig.VALIDATE_ORDER_RESPONSE_QUEUE,
                 ValidateBeerOrderResult.builder()
-                        .valid(true)
+                        .valid(validateBeerOrderRequest.getBeerOrder().getCustomerRef() == null ||
+                                !validateBeerOrderRequest.getBeerOrder().getCustomerRef().equals("fail-validation"))
                         .beerOrderId(validateBeerOrderRequest.getBeerOrder().getId()).build()
         );
     }
