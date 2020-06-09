@@ -3,6 +3,7 @@ package it.frigir.msscbeerorderservice.services.testcomponent;
 import it.frigir.brewery.model.events.AllocateOrderRequest;
 import it.frigir.brewery.model.events.AllocateOrderResult;
 import it.frigir.msscbeerorderservice.config.JmsConfig;
+import it.frigir.msscbeerorderservice.services.BeerOrderManagerIT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
@@ -24,10 +25,11 @@ public class BeerOrderAllocationListener {
 
         log.debug("Got test allocation order " + allocateOrderRequest);
 
+
         jmsTemplate.convertAndSend(JmsConfig.ALLOCATE_ORDER_RESPONSE_QUEUE,
                 AllocateOrderResult.builder()
-                        .allocationError(false)
-                        .pendingInventory(false)
+                        .allocationError(!allocateOrderRequest.getBeerOrder().getCustomerRef().equals(BeerOrderManagerIT.FAIL_ALLOCATION_CUSTOM_REF))
+                        .pendingInventory(!allocateOrderRequest.getBeerOrder().getCustomerRef().equals(BeerOrderManagerIT.ALLOCATION_PENDING_CUSTOM_REF))
                         .beerOrderDto(allocateOrderRequest.getBeerOrder()).build()
         );
     }

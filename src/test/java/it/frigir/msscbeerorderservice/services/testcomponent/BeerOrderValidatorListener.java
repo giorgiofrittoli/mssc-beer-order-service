@@ -3,6 +3,7 @@ package it.frigir.msscbeerorderservice.services.testcomponent;
 import it.frigir.brewery.model.events.ValidateBeerOrderRequest;
 import it.frigir.brewery.model.events.ValidateBeerOrderResult;
 import it.frigir.msscbeerorderservice.config.JmsConfig;
+import it.frigir.msscbeerorderservice.services.BeerOrderManagerIT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
@@ -27,8 +28,7 @@ public class BeerOrderValidatorListener {
 
         jmsTemplate.convertAndSend(JmsConfig.VALIDATE_ORDER_RESPONSE_QUEUE,
                 ValidateBeerOrderResult.builder()
-                        .valid(validateBeerOrderRequest.getBeerOrder().getCustomerRef() == null ||
-                                !validateBeerOrderRequest.getBeerOrder().getCustomerRef().equals("fail-validation"))
+                        .valid(!validateBeerOrderRequest.getBeerOrder().getCustomerRef().equals(BeerOrderManagerIT.FAIL_VALIDATION_CUSTOM_REF))
                         .beerOrderId(validateBeerOrderRequest.getBeerOrder().getId()).build()
         );
     }

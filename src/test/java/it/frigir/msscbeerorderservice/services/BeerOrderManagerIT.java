@@ -37,6 +37,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest
 public class BeerOrderManagerIT {
 
+    public static final String FAIL_VALIDATION_CUSTOM_REF = "fail-validation";
+    public static final String ALLOCATION_PENDING_CUSTOM_REF = "allocation-pending";
+    public static final String FAIL_ALLOCATION_CUSTOM_REF = "fail-pending";
+
     @Autowired
     BeerOrderManager beerOrderManager;
 
@@ -77,7 +81,6 @@ public class BeerOrderManagerIT {
                 .build());
 
         RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
-
     }
 
     @Test
@@ -143,8 +146,7 @@ public class BeerOrderManagerIT {
         wireMockServer.stubFor(get(BeerServiceRestTemplateImpl.BEER_UPC_PATH_V1 + beerDto.getUpc())
                 .willReturn(okJson(objectMapper.writeValueAsString(beerDto))));
 
-        BeerOrder beerOrder = createBeerOrder();
-        beerOrder.setCustomerRef("fail-validation");
+        BeerOrder beerOrder = createBeerOrder(FAIL_VALIDATION_CUSTOM_REF);
 
         BeerOrder savedBeerOrder = beerOrderManager.newBeerOrder(beerOrder);
 
@@ -160,9 +162,59 @@ public class BeerOrderManagerIT {
 
     }
 
+    @Test
+    void newToFailedAllocation() throws JsonProcessingException {
+        BeerDto beerDto = BeerDto.builder().id(beerId).upc(UPC).build();
+
+        wireMockServer.stubFor(get(BeerServiceRestTemplateImpl.BEER_UPC_PATH_V1 + beerDto.getUpc())
+                .willReturn(okJson(objectMapper.writeValueAsString(beerDto))));
+
+        BeerOrder beerOrder = createBeerOrder(FAIL_ALLOCATION_CUSTOM_REF);
+
+        BeerOrder savedBeerOrder = beerOrderManager.newBeerOrder(beerOrder);
+
+        await().untilAsserted(() -> {
+            BeerOrder foundOrder = beerOrderRepository.findById(savedBeerOrder.getId()).get();
+            assertEquals(BeerOrderStatusEnum.ALLOCATION_EXCEPTION, foundOrder.getOrderStatus());
+        });
+
+        BeerOrder failedAllocationBeerOrder = beerOrderRepository.findById(savedBeerOrder.getId()).get();
+
+        assertNotNull(failedAllocationBeerOrder);
+        assertEquals(BeerOrderStatusEnum.ALLOCATION_EXCEPTION, failedAllocationBeerOrder.getOrderStatus());
+    }
+
+    @Test
+    void newToAllocationPending() throws JsonProcessingException {
+        BeerDto beerDto = BeerDto.builder().id(beerId).upc(UPC).build();
+
+        wireMockServer.stubFor(get(BeerServiceRestTemplateImpl.BEER_UPC_PATH_V1 + beerDto.getUpc())
+                .willReturn(okJson(objectMapper.writeValueAsString(beerDto))));
+
+        BeerOrder beerOrder = createBeerOrder(ALLOCATION_PENDING_CUSTOM_REF);
+
+        BeerOrder savedBeerOrder = beerOrderManager.newBeerOrder(beerOrder);
+
+        await().untilAsserted(() -> {
+            BeerOrder foundOrder = beerOrderRepository.findById(savedBeerOrder.getId()).get();
+            assertEquals(BeerOrderStatusEnum.ALLOCATION_PENDING, foundOrder.getOrderStatus());
+        });
+
+        BeerOrder failedAllocationBeerOrder = beerOrderRepository.findById(savedBeerOrder.getId()).get();
+
+        assertNotNull(failedAllocationBeerOrder);
+        assertEquals(BeerOrderStatusEnum.ALLOCATION_PENDING, failedAllocationBeerOrder.getOrderStatus());
+    }
+
     public BeerOrder createBeerOrder() {
+        return createBeerOrder("");
+    }
+
+    public BeerOrder createBeerOrder(String customRef) {
+
         BeerOrder beerOrder = BeerOrder.builder()
                 .customer(testCustomer)
+                .customerRef(customRef)
                 .build();
 
         Set<BeerOrderLine> lines = new HashSet<>();
