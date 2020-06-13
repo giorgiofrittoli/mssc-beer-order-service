@@ -25,12 +25,14 @@ public class BeerOrderAllocationListener {
 
         log.debug("Got test allocation order " + allocateOrderRequest);
 
+        if(allocateOrderRequest.getBeerOrder().getCustomerRef().equals(BeerOrderManagerIT.CANCEL_ALLOCATION_CUSTOM_REF)){
+            jmsTemplate.convertAndSend(JmsConfig.ALLOCATE_ORDER_RESPONSE_QUEUE,
+                    AllocateOrderResult.builder()
+                            .allocationError(allocateOrderRequest.getBeerOrder().getCustomerRef().equals(BeerOrderManagerIT.FAIL_ALLOCATION_CUSTOM_REF))
+                            .pendingInventory(allocateOrderRequest.getBeerOrder().getCustomerRef().equals(BeerOrderManagerIT.ALLOCATION_PENDING_CUSTOM_REF))
+                            .beerOrderDto(allocateOrderRequest.getBeerOrder()).build()
+            );
+        }
 
-        jmsTemplate.convertAndSend(JmsConfig.ALLOCATE_ORDER_RESPONSE_QUEUE,
-                AllocateOrderResult.builder()
-                        .allocationError(allocateOrderRequest.getBeerOrder().getCustomerRef().equals(BeerOrderManagerIT.FAIL_ALLOCATION_CUSTOM_REF))
-                        .pendingInventory(allocateOrderRequest.getBeerOrder().getCustomerRef().equals(BeerOrderManagerIT.ALLOCATION_PENDING_CUSTOM_REF))
-                        .beerOrderDto(allocateOrderRequest.getBeerOrder()).build()
-        );
     }
 }
